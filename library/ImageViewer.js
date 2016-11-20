@@ -23,6 +23,12 @@ export default class ImageViewer extends Component{
 
     constructor(props){
         super(props);
+
+        this.state = {
+            curIndex: 0,
+            urls:[]
+        };
+
         this._panResponder = null;
     }
 
@@ -32,6 +38,43 @@ export default class ImageViewer extends Component{
         imageUrls: PropTypes.array.isRequired,
         index:PropTypes.number.isRequired
     };
+
+    initState(props){
+        let {index,imageUrls} = props;
+
+        this.setState({
+            curIndex: index,
+            urls: imageUrls
+        })
+    }
+
+    next(curIndex){
+        //show next images
+        console.log('next',curIndex)
+        let url = this.state.urls[curIndex + 1];
+
+        if(url){
+            this.setState({
+                curIndex: curIndex + 1
+            })
+        } else {
+            return true;
+        }
+    }
+
+    prev(curIndex){
+        //show prev images
+        console.log('prev',curIndex)
+        let url = this.state.urls[curIndex - 1];
+
+        if(url){
+            this.setState({
+                curIndex: curIndex - 1
+            })
+        } else {
+            return true;
+        }
+    }
 
     componentWillMount(){
         this._panResponder = PanResponder.create({
@@ -61,6 +104,14 @@ export default class ImageViewer extends Component{
                     this.props.onClose();
                     return;
                 }
+
+                if(gestureState.dx < -7.5) {
+                    this.next(this.state.curIndex);
+                }
+
+                if(gestureState.dx > 7.5) {
+                    this.prev(this.state.curIndex);
+                }
             },
 
             onPanResponderTerminate: (evt, gestureState) => {
@@ -69,19 +120,28 @@ export default class ImageViewer extends Component{
         });
     }
 
+    componentWillReceiveProps(nextProps){
+        //initial state data
+        this.initState(nextProps);
+    }
+
     render(){
 
-        let {index,shown,imageUrls} = this.props;
+        let {shown} = this.props;
 
         return (
             <Modal visible={shown} transparent={true} animationType={"none"}>
                 <View
                     style={viewer.container}
                     {...this._panResponder.panHandlers}>
-                    <Image style={viewer.img} source={{uri:imageUrls[index]}}></Image>
+                    <Image style={viewer.img} source={{uri: this.state.urls[this.state.curIndex]}}></Image>
                 </View>
             </Modal>
         )
+    }
+
+    componentDidUpdate(){
+        console.log('update',this.state.curIndex)
     }
 }
 
