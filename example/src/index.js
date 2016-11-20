@@ -31,11 +31,18 @@ export default class ImageViewerExample extends Component{
         }
     }
 
-    action(index){
+    openViewer(index){
         console.log('test',index);
         this.setState({
             shown:true,
             curIndex:index
+        })
+    }
+
+    closeViewer(){
+        this.setState({
+            shown:false,
+            curIndex:0
         })
     }
 
@@ -47,7 +54,7 @@ export default class ImageViewerExample extends Component{
                     imgsArr.map((url,index)=>{
                         return <TouchableOpacity key={index}
                                                  activeOpacity={1}
-                                                 onPress={this.action.bind(this,index)}>
+                                                 onPress={this.openViewer.bind(this,index)}>
                                 <Image
                                     source={{uri: url}}
                                     style={styles.img}/>
@@ -56,6 +63,7 @@ export default class ImageViewerExample extends Component{
                 }
                 <ImageViewer shown={this.state.shown}
                              imageUrls={imgsArr}
+                             onClose={this.closeViewer.bind(this)}
                              index={this.state.curIndex}>
                 </ImageViewer>
             </View>
