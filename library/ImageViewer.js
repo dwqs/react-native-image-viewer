@@ -29,7 +29,14 @@ export default class ImageViewer extends Component{
             urls:[]
         };
 
-        this._panResponder = null;
+        // image gesture responder
+        this.imagePanResponder = null;
+
+        //last click time
+        this.lastClickTime = 0;
+
+        //timer for click
+        this.clickTimer = null;
     }
 
     static propTypes = {
@@ -50,7 +57,6 @@ export default class ImageViewer extends Component{
 
     next(curIndex){
         //show next images
-        console.log('next',curIndex)
         let url = this.state.urls[curIndex + 1];
 
         if(url){
@@ -64,7 +70,6 @@ export default class ImageViewer extends Component{
 
     prev(curIndex){
         //show prev images
-        console.log('prev',curIndex)
         let url = this.state.urls[curIndex - 1];
 
         if(url){
@@ -77,12 +82,12 @@ export default class ImageViewer extends Component{
     }
 
     componentWillMount(){
-        this._panResponder = PanResponder.create({
+        this.imagePanResponder = PanResponder.create({
             onStartShouldSetPanResponder: (evt, gestureState) => true,
             onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
             onMoveShouldSetPanResponder: (evt, gestureState) => true,
             onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
-            onPanResponderTerminationRequest: (evt, gestureState) => true,
+            onPanResponderTerminationRequest: (evt, gestureState) => false,
 
             onPanResponderGrant: (evt, gestureState) => {
                 console.log('11111 grant',evt.nativeEvent);
@@ -94,14 +99,31 @@ export default class ImageViewer extends Component{
                 // 从成为响应者开始时的累计手势移动距离为gestureState.d{x,y}
                 console.log('22222 Move',evt.nativeEvent);
                 console.log('222222 Move',gestureState.dx,gestureState.dy);
+
+                //reset the value of lastClickTime
+                if(this.lastClickTime){
+                    this.lastClickTime = 0;
+                }
             },
 
             onPanResponderRelease: (evt, gestureState) => {
                 console.log('3333 Release',evt.nativeEvent);
                 console.log('3333333 Release',gestureState.dx,gestureState.dy);
-                //if dx/dy is zero, trigger click
+
+                //trigger double click
+                if(this.lastClickTime && new Date().getTime() - this.lastClickTime < 300){
+                    clearTimeout(this.clickTimer);
+                    console.log('double click');
+                    return;
+                }
+
+                this.lastClickTime = new Date().getTime();
+
+                //trigger click
                 if(gestureState.dx === 0){
-                    this.props.onClose();
+                    this.clickTimer = setTimeout(()=>{
+                        this.props.onClose();
+                    },300);
                     return;
                 }
 
@@ -133,15 +155,15 @@ export default class ImageViewer extends Component{
             <Modal visible={shown} transparent={true} animationType={"none"}>
                 <View
                     style={viewer.container}
-                    {...this._panResponder.panHandlers}>
+                    {...this.imagePanResponder.panHandlers}>
                     <Image style={viewer.img} source={{uri: this.state.urls[this.state.curIndex]}}></Image>
                 </View>
             </Modal>
         )
     }
 
-    componentDidUpdate(){
-        console.log('update',this.state.curIndex)
+    componentWillUnmount(){
+        this.imagePanResponder = null;
     }
 }
 
