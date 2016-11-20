@@ -23,6 +23,7 @@ export default class ImageViewer extends Component{
 
     constructor(props){
         super(props);
+        this._panResponder = null;
     }
 
     static propTypes = {
@@ -30,6 +31,39 @@ export default class ImageViewer extends Component{
         onClose: PropTypes.func,
         imageUrls: PropTypes.array,
         index:PropTypes.number
+    };
+
+    componentWillMount(){
+        this._panResponder = PanResponder.create({
+            onStartShouldSetPanResponder: (evt, gestureState) => true,
+            onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
+            onMoveShouldSetPanResponder: (evt, gestureState) => true,
+            onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
+            onPanResponderTerminationRequest: (evt, gestureState) => true,
+
+            onPanResponderGrant: (evt, gestureState) => {
+                console.log('11111 grant',evt.nativeEvent)
+                console.log('111111111 grant',gestureState)
+            },
+
+            onPanResponderMove: (evt, gestureState) => {
+                // 最近一次的移动距离为gestureState.move{X,Y}
+                // 从成为响应者开始时的累计手势移动距离为gestureState.d{x,y}
+                console.log('22222 Move',evt.nativeEvent)
+                console.log('222222 Move',gestureState)
+            },
+
+            onPanResponderRelease: (evt, gestureState) => {
+                console.log('3333 Release',evt.nativeEvent)
+                console.log('3333333 Release',gestureState)
+                // 用户放开了所有的触摸点，且此时视图已经成为了响应者。
+                // 一般来说这意味着一个手势操作已经成功完成。
+            },
+
+            onPanResponderTerminate: (evt, gestureState) => {
+                // another component become the responder, current grant will be cancel
+            }
+        });
     }
 
     render(){
@@ -38,7 +72,7 @@ export default class ImageViewer extends Component{
 
         return (
             <Modal visible={shown} transparent={true} animationType={"none"}>
-                <View style={viewer.container}>
+                <View style={viewer.container} {...this._panResponder.panHandlers}>
                     <Image style={viewer.img} source={{uri:imageUrls[index]}}></Image>
                 </View>
             </Modal>
