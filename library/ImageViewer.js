@@ -87,7 +87,7 @@ export default class ImageViewer extends Component{
             onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
             onMoveShouldSetPanResponder: (evt, gestureState) => true,
             onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
-            onPanResponderTerminationRequest: (evt, gestureState) => false,
+            onPanResponderTerminationRequest: (evt, gestureState) => true,
 
             onPanResponderGrant: (evt, gestureState) => {
                 console.log('11111 grant',evt.nativeEvent);
@@ -127,10 +127,12 @@ export default class ImageViewer extends Component{
                     return;
                 }
 
+                //left slide
                 if(gestureState.dx < -7.5) {
                     this.next(this.state.curIndex);
                 }
 
+                //right slide
                 if(gestureState.dx > 7.5) {
                     this.prev(this.state.curIndex);
                 }
@@ -164,6 +166,8 @@ export default class ImageViewer extends Component{
 
     componentWillUnmount(){
         this.imagePanResponder = null;
+        this.clickTimer = null;
+        this.lastClickTime = undefined;
     }
 }
 
