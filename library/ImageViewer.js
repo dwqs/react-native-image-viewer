@@ -27,10 +27,10 @@ export default class ImageViewer extends Component{
     }
 
     static propTypes = {
-        shown:PropTypes.bool,
-        onClose: PropTypes.func,
-        imageUrls: PropTypes.array,
-        index:PropTypes.number
+        shown:PropTypes.bool.isRequired,
+        onClose: PropTypes.func.isRequired,
+        imageUrls: PropTypes.array.isRequired,
+        index:PropTypes.number.isRequired
     };
 
     componentWillMount(){
