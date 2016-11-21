@@ -102,8 +102,8 @@ export default class ImageViewer extends Component{
 
                 if(evt.nativeEvent.changedTouches.length <= 1){
                     if(this.isClick){
-                        //trigger double click
-                        if(this.lastClickTime && new Date().getTime() - this.lastClickTime < 175){
+                        //trigger double click(175 or 300)
+                        if(this.lastClickTime && new Date().getTime() - this.lastClickTime < 300){
                             clearTimeout(this.clickTimer);
                             console.log('double click');
                             return;
@@ -126,7 +126,7 @@ export default class ImageViewer extends Component{
                                     easing: Easing.linear
                                 })
                             ]).start(()=>this.props.onClose());
-                        },175);
+                        },300);
                         return;
                     }
 
