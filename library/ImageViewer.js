@@ -174,7 +174,10 @@ export default class ImageViewer extends Component{
                     }]}
                     onLayout={this.handleLayout.bind(this)}
                     {...this.imagePanResponder.panHandlers}>
-                    <Image style={viewer.img} source={{uri: this.state.urls[this.state.curIndex]}}></Image>
+                    <Image style={viewer.img}
+                           source={{uri: this.state.urls[this.state.curIndex]}}
+                           onLoadStart={this.imageLoadStart.bind(this)}
+                           onLoad={this.imageLoadSuccess.bind(this)} />
                 </Animated.View>
             </Modal>
         )
@@ -237,6 +240,16 @@ export default class ImageViewer extends Component{
         } else {
             return true;
         }
+    }
+
+    imageLoadStart(e){
+        //start load
+        console.log('start',e.nativeEvent)
+    }
+
+    imageLoadSuccess(e){
+        //success load
+        console.log('end',e.nativeEvent)
     }
 }
 
