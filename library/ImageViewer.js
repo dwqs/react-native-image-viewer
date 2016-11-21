@@ -14,7 +14,9 @@ import {
     Modal,
     Platform,
     PanResponder,
-    Dimensions
+    Dimensions,
+    Easing,
+    Animated
 } from 'react-native';
 
 let {width} = Dimensions.get('window');
@@ -40,6 +42,10 @@ export default class ImageViewer extends Component{
 
         //timer for click
         this.clickTimer = null;
+
+        //Animated of view
+        this.fadeAnim = new Animated.Value(0);  //opacity
+        this.scalable = new Animated.Value(0);  //scale
     }
 
     static propTypes = {
@@ -49,42 +55,8 @@ export default class ImageViewer extends Component{
         index:PropTypes.number.isRequired
     };
 
-    initState(props){
-        let {index,imageUrls} = props;
-
-        this.setState({
-            curIndex: index,
-            urls: imageUrls
-        })
-    }
-
-    next(curIndex){
-        //show next images
-        let url = this.state.urls[curIndex + 1];
-
-        if(url){
-            this.setState({
-                curIndex: curIndex + 1
-            })
-        } else {
-            return true;
-        }
-    }
-
-    prev(curIndex){
-        //show prev images
-        let url = this.state.urls[curIndex - 1];
-
-        if(url){
-            this.setState({
-                curIndex: curIndex - 1
-            })
-        } else {
-            return true;
-        }
-    }
-
     componentWillMount(){
+
         this.imagePanResponder = PanResponder.create({
             onStartShouldSetPanResponder: (evt, gestureState) => true,
             onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
@@ -142,7 +114,18 @@ export default class ImageViewer extends Component{
                     //trigger click
                     if(gestureState.dx === 0){
                         this.clickTimer = setTimeout(()=>{
-                            this.props.onClose();
+                            Animated.parallel([
+                                Animated.timing(this.fadeAnim, {
+                                    toValue: 0,
+                                    duration: 150,
+                                    easing: Easing.linear
+                                }),
+                                Animated.timing(this.scalable,{
+                                    toValue: 0,
+                                    duration: 150,
+                                    easing: Easing.linear
+                                })
+                            ]).start(()=>this.props.onClose());
                         },300);
                         return;
                     }
@@ -157,7 +140,7 @@ export default class ImageViewer extends Component{
                         this.prev(this.state.curIndex);
                     }
                 } else {
-                    
+
                 }
             },
 
@@ -168,8 +151,12 @@ export default class ImageViewer extends Component{
     }
 
     componentWillReceiveProps(nextProps){
-        //initial state data
-        this.initState(nextProps);
+        //initial data
+        this.init(nextProps);
+    }
+
+    handleLayout(){
+        
     }
 
     render(){
@@ -178,11 +165,17 @@ export default class ImageViewer extends Component{
 
         return (
             <Modal visible={shown} transparent={true} animationType={"none"}>
-                <View
-                    style={viewer.container}
+                <Animated.View
+                    style={[viewer.container,{
+                        opacity:this.fadeAnim,
+                        transform:[
+                            {scale: this.scalable}
+                        ]
+                    }]}
+                    onLayout={this.handleLayout.bind(this)}
                     {...this.imagePanResponder.panHandlers}>
                     <Image style={viewer.img} source={{uri: this.state.urls[this.state.curIndex]}}></Image>
-                </View>
+                </Animated.View>
             </Modal>
         )
     }
@@ -191,6 +184,59 @@ export default class ImageViewer extends Component{
         this.imagePanResponder = null;
         this.clickTimer = null;
         this.lastClickTime = undefined;
+        this.isClick = undefined;
+        
+        this.fadeAnim = undefined;
+        this.scalable = undefined
+    }
+
+    init(props){
+        let {index,imageUrls} = props;
+
+        this.setState({
+            curIndex: index,
+            urls: imageUrls
+        });
+
+
+        Animated.parallel([
+            Animated.timing(this.fadeAnim, {
+                toValue: 1,
+                duration: 300,
+                easing: Easing.linear
+            }),
+            Animated.timing(this.scalable,{
+                toValue: 1,
+                duration: 300,
+                easing: Easing.linear
+            })
+        ]).start();
+    }
+
+    next(curIndex){
+        //show next images
+        let url = this.state.urls[curIndex + 1];
+
+        if(url){
+            this.setState({
+                curIndex: curIndex + 1
+            })
+        } else {
+            return true;
+        }
+    }
+
+    prev(curIndex){
+        //show prev images
+        let url = this.state.urls[curIndex - 1];
+
+        if(url){
+            this.setState({
+                curIndex: curIndex - 1
+            })
+        } else {
+            return true;
+        }
     }
 }
 
