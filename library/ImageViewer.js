@@ -90,7 +90,8 @@ export default class ImageViewer extends Component{
             onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
             onMoveShouldSetPanResponder: (evt, gestureState) => true,
             onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
-            onPanResponderTerminationRequest: (evt, gestureState) => true,
+            //to trigger multiple touches, this method should return false
+            onPanResponderTerminationRequest: (evt, gestureState) => false,
 
             onPanResponderGrant: (evt, gestureState) => {
                 console.log('11111 grant',evt.nativeEvent);
