@@ -96,7 +96,15 @@ export default class ImageViewer extends Component{
             onPanResponderGrant: (evt, gestureState) => {
                 console.log('11111 grant',evt.nativeEvent);
                 console.log('111111111 grant',gestureState.dx,gestureState.dy);
-                this.isClick = true;
+                if(evt.nativeEvent.changedTouches.length <= 1){
+                    //single touch
+                    this.isClick = true;
+                } else {
+                    //multiple touches
+                    this.isClick = false;
+                    this.lastClickTime = 0;
+                }
+
             },
 
             onPanResponderMove: (evt, gestureState) => {
@@ -105,10 +113,14 @@ export default class ImageViewer extends Component{
                 console.log('22222 Move',evt.nativeEvent);
                 console.log('222222 Move',gestureState.dx,gestureState.dy);
 
-                //reset the value of lastClickTime
-                if(this.isClick){
-                    this.isClick = false;
-                    this.lastClickTime = 0;
+                if(evt.nativeEvent.changedTouches.length <= 1){
+                    //reset the value of lastClickTime
+                    if(this.isClick){
+                        this.isClick = false;
+                        this.lastClickTime = 0;
+                    }
+                } else {
+
                 }
             },
 
@@ -116,32 +128,36 @@ export default class ImageViewer extends Component{
                 console.log('3333 Release',evt.nativeEvent);
                 console.log('3333333 Release',gestureState.dx,gestureState.dy);
 
-                if(this.isClick){
-                    //trigger double click
-                    if(this.lastClickTime && new Date().getTime() - this.lastClickTime < 300){
-                        clearTimeout(this.clickTimer);
-                        console.log('double click');
+                if(evt.nativeEvent.changedTouches.length <= 1){
+                    if(this.isClick){
+                        //trigger double click
+                        if(this.lastClickTime && new Date().getTime() - this.lastClickTime < 300){
+                            clearTimeout(this.clickTimer);
+                            console.log('double click');
+                            return;
+                        }
+                        this.lastClickTime = new Date().getTime();
+                    }
+
+                    //trigger click
+                    if(gestureState.dx === 0){
+                        this.clickTimer = setTimeout(()=>{
+                            this.props.onClose();
+                        },300);
                         return;
                     }
-                    this.lastClickTime = new Date().getTime();
-                }
 
-                //trigger click
-                if(gestureState.dx === 0){
-                    this.clickTimer = setTimeout(()=>{
-                        this.props.onClose();
-                    },300);
-                    return;
-                }
+                    //left slide
+                    if(gestureState.dx < -7.5) {
+                        this.next(this.state.curIndex);
+                    }
 
-                //left slide
-                if(gestureState.dx < -7.5) {
-                    this.next(this.state.curIndex);
-                }
-
-                //right slide
-                if(gestureState.dx > 7.5) {
-                    this.prev(this.state.curIndex);
+                    //right slide
+                    if(gestureState.dx > 7.5) {
+                        this.prev(this.state.curIndex);
+                    }
+                } else {
+                    
                 }
             },
 
