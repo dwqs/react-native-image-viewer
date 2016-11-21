@@ -32,6 +32,9 @@ export default class ImageViewer extends Component{
         // image gesture responder
         this.imagePanResponder = null;
 
+        //whether is click
+        this.isClick = true;
+
         //last click time
         this.lastClickTime = 0;
 
@@ -92,6 +95,7 @@ export default class ImageViewer extends Component{
             onPanResponderGrant: (evt, gestureState) => {
                 console.log('11111 grant',evt.nativeEvent);
                 console.log('111111111 grant',gestureState.dx,gestureState.dy);
+                this.isClick = true;
             },
 
             onPanResponderMove: (evt, gestureState) => {
@@ -101,7 +105,8 @@ export default class ImageViewer extends Component{
                 console.log('222222 Move',gestureState.dx,gestureState.dy);
 
                 //reset the value of lastClickTime
-                if(this.lastClickTime){
+                if(this.isClick){
+                    this.isClick = false;
                     this.lastClickTime = 0;
                 }
             },
@@ -110,14 +115,15 @@ export default class ImageViewer extends Component{
                 console.log('3333 Release',evt.nativeEvent);
                 console.log('3333333 Release',gestureState.dx,gestureState.dy);
 
-                //trigger double click
-                if(this.lastClickTime && new Date().getTime() - this.lastClickTime < 300){
-                    clearTimeout(this.clickTimer);
-                    console.log('double click');
-                    return;
+                if(this.isClick){
+                    //trigger double click
+                    if(this.lastClickTime && new Date().getTime() - this.lastClickTime < 300){
+                        clearTimeout(this.clickTimer);
+                        console.log('double click');
+                        return;
+                    }
+                    this.lastClickTime = new Date().getTime();
                 }
-
-                this.lastClickTime = new Date().getTime();
 
                 //trigger click
                 if(gestureState.dx === 0){
