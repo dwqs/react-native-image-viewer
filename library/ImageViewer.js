@@ -193,14 +193,17 @@ export default class ImageViewer extends Component{
                            source={{uri: this.props.imageUrls[this.state.curIndex]}}
                            onLoadStart={this.imageLoadStart.bind(this)}
                            onLoad={this.imageLoadSuccess.bind(this)} />
-                    <View style={viewer.loading}>
-                        <View style={[viewer.common,viewer.outer]}></View>
-                        <Animated.View style={[viewer.common,viewer.inner,{
-                            transform:[
-                                {rotate:spin}
-                            ]
-                        }]}></Animated.View>
-                    </View>
+                    {
+                        !this.state.loadImgSuccess ?
+                            <View style={viewer.loading}>
+                                <View style={[viewer.common,viewer.outer]}></View>
+                                <Animated.View style={[viewer.common,viewer.inner,{
+                                    transform:[
+                                        {rotate:spin}
+                                    ]
+                                }]}></Animated.View>
+                            </View> : null
+                    }
                 </Animated.View>
             </Modal>
         )
@@ -236,9 +239,12 @@ export default class ImageViewer extends Component{
 
     startRotate(){
         this.state.rotateValue.setValue(0);
+
         if(this.state.loadImgSuccess){
+            // stop the rotate animation
             this.state.rotateValue.setValue(1);
         }
+        
         Animated.timing(this.state.rotateValue, {
             toValue: 1,
             duration: 800,
@@ -284,13 +290,15 @@ export default class ImageViewer extends Component{
     imageLoadSuccess(e){
         //success load
         console.log('end',e.nativeEvent);
-        this.setState({
-            loadImgSuccess:true
-        },() => {
-            setTimeout(()=>{
-                this.startRotate()
-            },3000)
-        })
+        setTimeout(() => {
+            this.setState({
+                loadImgSuccess:true
+            },() => {
+                setTimeout(()=>{
+                    this.startRotate()
+                },3000)
+            })
+        },2000)
     }
 }
 
