@@ -19,7 +19,7 @@ import {
     Animated
 } from 'react-native';
 
-let {width} = Dimensions.get('window');
+let {width,height} = Dimensions.get('window');
 
 export default class ImageViewer extends Component{
 
@@ -28,7 +28,12 @@ export default class ImageViewer extends Component{
 
         this.state = {
             curIndex: 0,
-            urls:[]
+            urls:[],
+            loadImgSuccess: false,
+            //Animated of view
+            fadeAnim: new Animated.Value(0),  //opacity
+            scalable: new Animated.Value(0),   //scale
+            rotateValue: new Animated.Value(0) //rotate
         };
 
         // image gesture responder
@@ -43,9 +48,6 @@ export default class ImageViewer extends Component{
         //timer for click
         this.clickTimer = null;
 
-        //Animated of view
-        this.fadeAnim = new Animated.Value(0);  //opacity
-        this.scalable = new Animated.Value(0);  //scale
     }
 
     static propTypes = {
@@ -115,14 +117,14 @@ export default class ImageViewer extends Component{
                     if(gestureState.dx === 0){
                         this.clickTimer = setTimeout(()=>{
                             Animated.parallel([
-                                Animated.timing(this.fadeAnim, {
+                                Animated.timing(this.state.fadeAnim, {
                                     toValue: 0,
-                                    duration: 100,
+                                    duration: 200,
                                     easing: Easing.linear
                                 }),
-                                Animated.timing(this.scalable,{
+                                Animated.timing(this.state.scalable,{
                                     toValue: 0,
-                                    duration: 100,
+                                    duration: 200,
                                     easing: Easing.linear
                                 })
                             ]).start(()=>this.props.onClose());
@@ -150,8 +152,13 @@ export default class ImageViewer extends Component{
         });
     }
 
+    // shouldComponentUpdate(nextProps, nextState){
+    //     return nextState.curIndex !== this.state.curIndex;
+    // }
+
     componentWillReceiveProps(nextProps){
         //initial data
+        this.startRotate();
         this.init(nextProps);
     }
 
@@ -162,14 +169,18 @@ export default class ImageViewer extends Component{
     render(){
 
         let {shown} = this.props;
+        const spin = this.state.rotateValue.interpolate({
+            inputRange: [0, 1],
+            outputRange: ['0deg', '360deg']
+        });
 
         return (
             <Modal visible={shown} transparent={true} animationType={"none"}>
                 <Animated.View
                     style={[viewer.container,{
-                        opacity:this.fadeAnim,
+                        opacity:this.state.fadeAnim,
                         transform:[
-                            {scale: this.scalable}
+                            {scale: this.state.scalable}
                         ]
                     }]}
                     onLayout={this.handleLayout.bind(this)}
@@ -178,6 +189,14 @@ export default class ImageViewer extends Component{
                            source={{uri: this.state.urls[this.state.curIndex]}}
                            onLoadStart={this.imageLoadStart.bind(this)}
                            onLoad={this.imageLoadSuccess.bind(this)} />
+                    <View style={viewer.loading}>
+                        <View style={[viewer.common,viewer.outer]}></View>
+                        <Animated.View style={[viewer.common,viewer.inner,{
+                            transform:[
+                                {rotate:spin}
+                            ]
+                        }]}></Animated.View>
+                    </View>
                 </Animated.View>
             </Modal>
         )
@@ -188,9 +207,6 @@ export default class ImageViewer extends Component{
         this.clickTimer = null;
         this.lastClickTime = undefined;
         this.isClick = undefined;
-        
-        this.fadeAnim = undefined;
-        this.scalable = undefined
     }
 
     init(props){
@@ -199,21 +215,32 @@ export default class ImageViewer extends Component{
         this.setState({
             curIndex: index,
             urls: imageUrls
+        },() => {
+            Animated.parallel([
+                Animated.timing(this.state.fadeAnim, {
+                    toValue: 1,
+                    duration: 300,
+                    easing: Easing.linear
+                }),
+                Animated.timing(this.state.scalable,{
+                    toValue: 1,
+                    duration: 300,
+                    easing: Easing.linear
+                })
+            ]).start();
         });
+    }
 
-
-        Animated.parallel([
-            Animated.timing(this.fadeAnim, {
-                toValue: 1,
-                duration: 300,
-                easing: Easing.linear
-            }),
-            Animated.timing(this.scalable,{
-                toValue: 1,
-                duration: 300,
-                easing: Easing.linear
-            })
-        ]).start();
+    startRotate(){
+        this.state.rotateValue.setValue(0);
+        if(this.state.loadImgSuccess){
+            this.state.rotateValue.setValue(1);
+        }
+        Animated.timing(this.state.rotateValue, {
+            toValue: 1,
+            duration: 800,
+            easing: Easing.linear
+        }).start(() => this.startRotate());
     }
 
     next(curIndex){
@@ -223,6 +250,8 @@ export default class ImageViewer extends Component{
         if(url){
             this.setState({
                 curIndex: curIndex + 1
+            },() => {
+                this.startRotate()
             })
         } else {
             return true;
@@ -236,6 +265,8 @@ export default class ImageViewer extends Component{
         if(url){
             this.setState({
                 curIndex: curIndex - 1
+            },() => {
+                this.startRotate()
             })
         } else {
             return true;
@@ -249,7 +280,14 @@ export default class ImageViewer extends Component{
 
     imageLoadSuccess(e){
         //success load
-        console.log('end',e.nativeEvent)
+        console.log('end',e.nativeEvent);
+        this.setState({
+            loadImgSuccess:true
+        },() => {
+            setTimeout(()=>{
+                this.startRotate()
+            },3000)
+        })
     }
 }
 
@@ -268,5 +306,31 @@ let viewer = StyleSheet.create({
     img:{
         width: width,
         height:300
+    },
+
+    loading:{
+        position:'absolute',
+        top: height/2 - 30,
+        left: width/2 - 30
+    },
+
+    common:{
+        position:'absolute',
+        zIndex:22,
+        width:30,
+        height: 30,
+        borderWidth:3,
+        borderRadius:15
+    },
+
+    outer:{
+        borderColor:'gray'
+    },
+
+    inner:{
+        borderTopColor: 'rgba(255,255,255,0.8)',
+        borderRightColor: 'transparent',
+        borderBottomColor: 'transparent',
+        borderLeftColor: 'transparent'
     }
 });
