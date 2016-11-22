@@ -28,7 +28,6 @@ export default class ImageViewer extends Component{
 
         this.state = {
             curIndex: 0,
-            urls:[],
             loadImgSuccess: false,
             //Animated of view
             fadeAnim: new Animated.Value(0),  //opacity
@@ -186,7 +185,7 @@ export default class ImageViewer extends Component{
                     onLayout={this.handleLayout.bind(this)}
                     {...this.imagePanResponder.panHandlers}>
                     <Image style={viewer.img}
-                           source={{uri: this.state.urls[this.state.curIndex]}}
+                           source={{uri: this.props.imageUrls[this.state.curIndex]}}
                            onLoadStart={this.imageLoadStart.bind(this)}
                            onLoad={this.imageLoadSuccess.bind(this)} />
                     <View style={viewer.loading}>
@@ -213,8 +212,7 @@ export default class ImageViewer extends Component{
         let {index,imageUrls} = props;
 
         this.setState({
-            curIndex: index,
-            urls: imageUrls
+            curIndex: index
         },() => {
             Animated.parallel([
                 Animated.timing(this.state.fadeAnim, {
@@ -245,7 +243,7 @@ export default class ImageViewer extends Component{
 
     next(curIndex){
         //show next images
-        let url = this.state.urls[curIndex + 1];
+        let url = this.props.imageUrls[curIndex + 1];
 
         if(url){
             this.setState({
@@ -260,7 +258,7 @@ export default class ImageViewer extends Component{
 
     prev(curIndex){
         //show prev images
-        let url = this.state.urls[curIndex - 1];
+        let url = this.props.imageUrls[curIndex - 1];
 
         if(url){
             this.setState({
