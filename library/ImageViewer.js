@@ -244,7 +244,7 @@ export default class ImageViewer extends Component{
             // stop the rotate animation
             this.state.rotateValue.setValue(1);
         }
-        
+
         Animated.timing(this.state.rotateValue, {
             toValue: 1,
             duration: 800,
@@ -258,7 +258,8 @@ export default class ImageViewer extends Component{
 
         if(url){
             this.setState({
-                curIndex: curIndex + 1
+                curIndex: curIndex + 1,
+                loadImgSuccess: false
             },() => {
                 this.startRotate()
             })
@@ -273,7 +274,8 @@ export default class ImageViewer extends Component{
 
         if(url){
             this.setState({
-                curIndex: curIndex - 1
+                curIndex: curIndex - 1,
+                loadImgSuccess: false
             },() => {
                 this.startRotate()
             })
