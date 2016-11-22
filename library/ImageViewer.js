@@ -126,18 +126,23 @@ export default class ImageViewer extends Component{
                                     duration: 200,
                                     easing: Easing.linear
                                 })
-                            ]).start(()=>this.props.onClose());
+                            ]).start(()=>{
+                                this.setState({
+                                   loadImgSuccess:false
+                                });
+                                this.props.onClose();
+                            });
                         },300);
                         return;
                     }
 
                     //left slide
-                    if(gestureState.dx < -7.5) {
+                    if(gestureState.dx < -80) {
                         this.next(this.state.curIndex);
                     }
 
                     //right slide
-                    if(gestureState.dx > 7.5) {
+                    if(gestureState.dx > 80) {
                         this.prev(this.state.curIndex);
                     }
                 } else {
