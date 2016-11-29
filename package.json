@@ -1,6 +1,6 @@
 {
-  "name": "ReactNaitveImagePreviewer",
-  "version": "0.5.2",
+  "name": "ImageViewer",
+  "version": "0.5.3",
   "author": "pomysky@gamil.com",
   "description": "A pure JavaScript image viewer component for react-native apps",
   "license": "MIT",
