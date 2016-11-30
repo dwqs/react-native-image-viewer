@@ -146,7 +146,7 @@ export default class ImageViewer extends Component{
                         this.prev(this.state.curIndex);
                     }
                 } else {
-
+                    console.log('多指触发');
                 }
             },
 
@@ -193,17 +193,6 @@ export default class ImageViewer extends Component{
                            source={{uri: this.props.imageUrls[this.state.curIndex]}}
                            onLoadStart={this.imageLoadStart.bind(this)}
                            onLoad={this.imageLoadSuccess.bind(this)} />
-                    {
-                        !this.state.loadImgSuccess ?
-                            <View style={viewer.loading}>
-                                <View style={[viewer.common,viewer.outer]}></View>
-                                <Animated.View style={[viewer.common,viewer.inner,{
-                                    transform:[
-                                        {rotate:spin}
-                                    ]
-                                }]}></Animated.View>
-                            </View> : null
-                    }
                 </Animated.View>
             </Modal>
         )
@@ -292,15 +281,15 @@ export default class ImageViewer extends Component{
     imageLoadSuccess(e){
         //success load
         console.log('end',e.nativeEvent);
-        setTimeout(() => {
-            this.setState({
-                loadImgSuccess:true
-            },() => {
-                setTimeout(()=>{
-                    this.startRotate()
-                },3000)
-            })
-        },2000)
+        // setTimeout(() => {
+        //     this.setState({
+        //         loadImgSuccess:true
+        //     },() => {
+        //         setTimeout(()=>{
+        //             this.startRotate()
+        //         },3000)
+        //     })
+        // },2000)
     }
 }
 
@@ -347,3 +336,15 @@ let viewer = StyleSheet.create({
         borderLeftColor: 'transparent'
     }
 });
+
+// {
+//     !this.state.loadImgSuccess ?
+//         <View style={viewer.loading}>
+//             <View style={[viewer.common,viewer.outer]}></View>
+//             <Animated.View style={[viewer.common,viewer.inner,{
+//                 transform:[
+//                     {rotate:spin}
+//                 ]
+//             }]}></Animated.View>
+//         </View> : null
+// }
