@@ -337,7 +337,7 @@ export default class ImageViewer extends Component{
     }
 
     modalDismissed(){
-
+        //this callback is required for android
     }
 }
 
