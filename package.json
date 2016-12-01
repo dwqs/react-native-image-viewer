@@ -1,8 +1,9 @@
 {
   "name": "ImageViewer",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "author": "pomysky@gamil.com",
   "description": "A pure JavaScript image viewer component for react-native apps",
+  "main": "library/ImageViewer.js",
   "license": "MIT",
   "keywords": [
     "react",
@@ -18,7 +19,10 @@
       "email": "pomysky@gmail.com"
     }
   ],
-  "main": "library/ImageViewer.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dwqs/react-native-image-viewer.git"
+  },
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "test": "jest"
