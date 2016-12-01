@@ -68,5 +68,11 @@ closeViewer(){
 |onClose|hidden the ImageViewer when click on ImageViewer|required|
 |index|the index of image url(in imageUrls) when open the ImageViewer|required|
 
+## TODO
+
+* zoom image
+* loading animation when load image
+* title bar
+
 ## License
 MIT
