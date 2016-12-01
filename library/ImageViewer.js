@@ -214,7 +214,7 @@ export default class ImageViewer extends Component{
         // });
 
         return (
-            <Modal visible={shown} transparent={true} animationType={"none"} onRequestClose= >
+            <Modal visible={shown} transparent={true} animationType={"none"} onRequestClose={this.modalDismissed.bind(this)} >
                 <Animated.View
                     style={[viewer.container,{
                         opacity:this.state.fadeAnim,
@@ -257,7 +257,7 @@ export default class ImageViewer extends Component{
             //show current image
             let offset = this.state.midIndex - this.state.curIndex;
             this.positionX = offset*width;
-            this.standardPositionX = this.positionX;
+            this.standardPositionX = len%2 === 0 ? this.positionX + width / 2 : this.positionX;
             this.animatedPositionX.setValue(this.standardPositionX);
 
             Animated.parallel([
@@ -336,23 +336,8 @@ export default class ImageViewer extends Component{
         }
     }
 
-    imageLoadStart(e){
-        //start load
-        console.log('start',e.nativeEvent)
-    }
+    modalDismissed(){
 
-    imageLoadSuccess(e){
-        //success load
-        console.log('end',e.nativeEvent);
-        // setTimeout(() => {
-        //     this.setState({
-        //         loadImgSuccess:true
-        //     },() => {
-        //         setTimeout(()=>{
-        //             this.startRotate()
-        //         },3000)
-        //     })
-        // },2000)
     }
 }
 
