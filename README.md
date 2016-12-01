@@ -6,7 +6,7 @@ A pure JavaScript image viewer component for react-native apps with pan, support
 #### On IOS:
 ![viewer-ios](http://i1.piimg.com/567571/76e6e8b18482df7f.gif)
 
-#### On mobile:
+#### On android:
 ![viewer-android](http://i1.piimg.com/567571/34d3e506089bf002.gif)
 
 ## Installation
