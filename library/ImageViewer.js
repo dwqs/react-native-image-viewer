@@ -257,6 +257,11 @@ export default class ImageViewer extends Component{
 
         return (
             <Modal visible={shown} transparent={true} animationType={"none"} onRequestClose={this.modalDismissed.bind(this)} >
+                <View style={viewer.titleBar}>
+                    <Text style={viewer.title}>
+                        {(this.state.curIndex + 1)} / {this.props.imageUrls.length}
+                    </Text>
+                </View>
                 <Animated.View
                     style={[viewer.container,{
                         opacity:this.state.fadeAnim,
@@ -461,15 +466,29 @@ export default class ImageViewer extends Component{
 }
 
 let viewer = StyleSheet.create({
+
+    titleBar:{
+        height: 40,
+        width: width,
+        backgroundColor:'#000',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: Platform.OS === 'ios' ? 20 : 0
+    },
+
+    title:{
+        color:'#FFFFFF',
+        fontSize: 18
+    },
+
     container: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         overflow: 'hidden',
         backgroundColor:'#000',
-        borderWidth:1,
-        borderColor:'red',
-        marginTop: Platform.OS === 'ios' ? 20 : 0
+        // borderWidth:1,
+        // borderColor:'red'
     },
 
     moveBox:{
