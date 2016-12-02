@@ -1,6 +1,8 @@
 ## Overview
 A pure JavaScript image viewer component for react-native apps with pan, supporting both iOS and Android.
 
+>React Native required 0.33+
+
 ## Show Cases
 
 #### On IOS:
