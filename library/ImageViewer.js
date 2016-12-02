@@ -19,7 +19,17 @@ import {
     Animated
 } from 'react-native';
 
+/**
+ * the width & height of screen
+ */
 let {width,height} = Dimensions.get('window');
+
+const screenWidth = width;
+const screenHeight = height;
+
+console.log('screen',width,height)
+
+const fetch_image_failed_url = 'http://p1.bpimg.com/567571/299dcb5013da39c8.png';
 
 export default class ImageViewer extends Component{
 
@@ -51,6 +61,7 @@ export default class ImageViewer extends Component{
         //timer for click
         this.clickTimer = null;
 
+        //the benchmark position of moveBox
         this.standardPositionX = 0;
 
         //the position of moveBox,for toggle image
@@ -59,10 +70,11 @@ export default class ImageViewer extends Component{
     }
 
     static propTypes = {
-        shown:PropTypes.bool.isRequired,
+        shown: PropTypes.bool.isRequired,
         onClose: PropTypes.func.isRequired,
         imageUrls: PropTypes.array.isRequired,
-        index:PropTypes.number.isRequired
+        index: PropTypes.number.isRequired,
+        failedUrl: PropTypes.string
     };
 
     componentWillMount(){
@@ -173,14 +185,10 @@ export default class ImageViewer extends Component{
         });
     }
 
-    // shouldComponentUpdate(nextProps, nextState){
-    //     return nextState.curIndex !== this.state.curIndex;
-    // }
-
     componentWillReceiveProps(nextProps){
-        //initial data
-        //this.startRotate();
+
         if(nextProps.shown){
+            //initial state data
             this.init(nextProps);
         }
     }
@@ -191,17 +199,52 @@ export default class ImageViewer extends Component{
 
     getImageList(){
         let {imageUrls} = this.props;
-        const ImageElements = imageUrls.map((imageUrl,index) => {
-            return (
-                <Animated.Image
-                    key={index}
-                    style={viewer.img}
-                    source={{uri:imageUrl}}>
-                </Animated.Image>
-            )
+
+        const ImageLists = imageUrls.map((imageUrl,index) => {
+
+            let width = this.state.imagesInfo[index] && this.state.imagesInfo[index].width;
+            let height = this.state.imagesInfo[index] && this.state.imagesInfo[index].height;
+            const imageInfo = this.state.imagesInfo[index];
+
+            //zoom the image if image is too large
+            if (width > screenWidth) {
+                const widthPixel = screenWidth / width;
+                width *= widthPixel;
+                height *= widthPixel;
+            }
+
+            if (height > screenHeight) {
+                const HeightPixel = screenHeight / height;
+                width *= HeightPixel;
+                height *= HeightPixel;
+            }
+
+            switch (imageInfo.status){
+                case 'loading':
+                    return (
+                        <View style={viewer.loadingImgView} key={index}>
+                            <Image style={viewer.loadingImg}
+                                   source={{uri: imageUrl}}/>
+                        </View>
+                    );
+                case 'success':
+                    return (
+                        <Animated.Image
+                            key={index}
+                            style={{width: width, height:height}}
+                            source={{uri:imageUrl}}>
+                        </Animated.Image>
+                    );
+                case 'fail':
+                    return (
+                        <Image key={index}
+                               style={viewer.img}
+                               source={{uri: this.props.failedUrl ? this.props.failedUrl : fetch_image_failed_url}}/>
+                    );
+            }
         });
 
-        return ImageElements;
+        return ImageLists;
     }
 
     render(){
@@ -227,7 +270,7 @@ export default class ImageViewer extends Component{
                         width:imageUrls.length * width,
                         transform: [{ translateX: this.animatedPositionX}]
                     }]}>
-                        {this.getImageList()}
+                        {this.state.imagesInfo.length && this.getImageList()}
                     </Animated.View>
                     {
                         !this.state.imageLoaded ?
@@ -251,6 +294,7 @@ export default class ImageViewer extends Component{
         this.lastClickTime = undefined;
         this.isClick = undefined;
 
+        this.standardPositionX = undefined;
         this.animatedPositionX = null;
         this.positionX = undefined;
     }
@@ -282,9 +326,7 @@ export default class ImageViewer extends Component{
             this.startRotate();
 
             //fetch current image
-            setTimeout(()=>{
-                this.fetchImage(index);
-            },1500);
+            this.fetchImage(index);
 
             //show current image of position
             let offset = this.state.midIndex - this.state.curIndex;
@@ -310,7 +352,6 @@ export default class ImageViewer extends Component{
     updateImageInfo(index,imageInfo){
         let imagesInfo = this.state.imagesInfo.slice();
         imagesInfo[index] = imageInfo;
-        console.log('111111',imageInfo)
         this.setState({
             imagesInfo:imagesInfo,
             imageLoaded: true
@@ -321,14 +362,13 @@ export default class ImageViewer extends Component{
 
         if (this.state.imagesInfo[index].status === 'success') {
             // already loaded
+            this.setState({
+                imageLoaded: true
+            });
             return;
         }
 
-        this.setState({
-            imageLoaded: false
-        });
-
-        let imageInfo = Object.assign({},this.state.imagesInfo[index]);
+        const imageInfo = Object.assign({},this.state.imagesInfo[index]);
         const prefetchImagePromise = Image.prefetch(imageInfo.url);
 
         prefetchImagePromise.then(() => {
@@ -382,14 +422,9 @@ export default class ImageViewer extends Component{
         if(url){
             this.standardPositionX -= width;
             this.setState({
-                curIndex: curIndex + 1
-            },() => {
-                setTimeout(()=>{
-                    this.fetchImage(this.state.curIndex);
-                },1500);
-                this.resetPosition();
-                this.startRotate()
-            })
+                curIndex: curIndex + 1,
+                imageLoaded: false
+            },this.callback)
         } else {
             return true;
         }
@@ -402,17 +437,22 @@ export default class ImageViewer extends Component{
         if(url){
             this.standardPositionX += width;
             this.setState({
-                curIndex: curIndex - 1
-            },() => {
-                setTimeout(()=>{
-                    this.fetchImage(this.state.curIndex);
-                },1500);
-                this.resetPosition();
-                this.startRotate()
-            })
+                curIndex: curIndex - 1,
+                imageLoaded: false
+            },this.callback)
         } else {
             return true;
         }
+    }
+
+    /**
+     * the callback for state updated
+     */
+
+    callback(){
+        this.fetchImage(this.state.curIndex);
+        this.resetPosition();
+        this.startRotate()
     }
 
     modalDismissed(){
@@ -427,20 +467,32 @@ let viewer = StyleSheet.create({
         alignItems: 'center',
         overflow: 'hidden',
         backgroundColor:'#000',
-        //borderWidth:1,
-        //borderColor:'red',
+        borderWidth:1,
+        borderColor:'red',
         marginTop: Platform.OS === 'ios' ? 20 : 0
     },
 
     moveBox:{
-        height:310,
+        //height:300,
         flexDirection: 'row',
         alignItems: 'center',
     },
 
+    loadingImgView:{
+        width: width,
+        height: 300,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+
+    loadingImg:{
+        width: width - 50,
+        height: 150,
+    },
+
     img:{
         width: width,
-        height:300,
+        height: 300,
     },
 
     loading:{

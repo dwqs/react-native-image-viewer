@@ -19,7 +19,7 @@ let imgsArr = [
     'http://img.sc115.com/uploads1/sc/jpgs/1508/apic22412_sc115.com.jpg',
     'http://h.hiphotos.baidu.com/zhidao/pic/item/0df431adcbef7609bca7d58a2adda3cc7cd99e73.jpg',
     'http://facebook.github.io/react/img/logo_og.png',
-    'http://scimg.jb51.net/allimg/160815/103-160Q509544OC.jpg'
+    'http://i1.piimg.com/567571/687cf1626c10e320.png'
 ];
 
 export default class ImageViewerExample extends Component{
