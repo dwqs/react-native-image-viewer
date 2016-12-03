@@ -6,10 +6,10 @@ A pure JavaScript image viewer component for react-native apps with pan, support
 ## Show Cases
 
 #### On IOS:
-![viewer-ios](http://i1.piimg.com/567571/76e6e8b18482df7f.gif)
+![viewer-ios](http://p1.bqimg.com/567571/b7515755d4d7d903.gif)
 
-#### On android:
-![viewer-android](http://i1.piimg.com/567571/34d3e506089bf002.gif)
+#### On Android:
+![viewer-android](http://p1.bqimg.com/567571/a51bff7b99e0462b.gif)
 
 ## Installation
 First, install `react-native-image-viewer` from npm:

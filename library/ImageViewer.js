@@ -535,8 +535,8 @@ let viewer = StyleSheet.create({
         alignItems: 'center',
         overflow: 'hidden',
         backgroundColor:'#000',
-        borderWidth:1,
-        borderColor:'red'
+        //borderWidth:1,
+        //borderColor:'red'
     },
 
     moveBox:{
