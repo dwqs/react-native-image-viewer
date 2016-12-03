@@ -27,8 +27,7 @@ let {width,height} = Dimensions.get('window');
 const screenWidth = width;
 const screenHeight = height;
 
-console.log('screen',width,height)
-
+//show a default image if image is loaded fail
 const fetch_image_failed_url = 'http://p1.bpimg.com/567571/299dcb5013da39c8.png';
 
 export default class ImageViewer extends Component{
@@ -197,6 +196,9 @@ export default class ImageViewer extends Component{
         
     }
 
+    /**
+     * render image list for preview
+     */
     getImageList(){
         let {imageUrls} = this.props;
 
@@ -217,6 +219,7 @@ export default class ImageViewer extends Component{
                 const HeightPixel = screenHeight / height;
                 width *= HeightPixel;
                 height *= HeightPixel;
+                //height -= 40;
             }
 
             switch (imageInfo.status){
@@ -231,7 +234,9 @@ export default class ImageViewer extends Component{
                     return (
                         <Animated.Image
                             key={index}
-                            style={{width: width, height:height}}
+                            style={{width: width, height:height,transform:[{
+                                scale:1
+                            }]}}
                             source={{uri:imageUrl}}>
                         </Animated.Image>
                     );
@@ -304,6 +309,10 @@ export default class ImageViewer extends Component{
         this.positionX = undefined;
     }
 
+    /**
+     * init data
+     * @param props
+     */
     init(props){
         let {index,imageUrls} = props;
         let len = imageUrls.length;
@@ -354,6 +363,11 @@ export default class ImageViewer extends Component{
         });
     }
 
+    /**
+     * update imageInfo of state
+     * @param index
+     * @param imageInfo
+     */
     updateImageInfo(index,imageInfo){
         let imagesInfo = this.state.imagesInfo.slice();
         imagesInfo[index] = imageInfo;
@@ -363,6 +377,10 @@ export default class ImageViewer extends Component{
         });
     }
 
+    /**
+     * fetch image from url
+     * @param index current index of image
+     */
     fetchImage(index){
 
         if (this.state.imagesInfo[index].status === 'success') {
@@ -394,6 +412,9 @@ export default class ImageViewer extends Component{
         })
     }
 
+    /**
+     * start loading animation for load image
+     */
     startRotate(){
         this.state.rotateValue.setValue(0);
 
@@ -410,6 +431,9 @@ export default class ImageViewer extends Component{
         }).start(() => this.startRotate());
     }
 
+    /**
+     * reset the position of moveBox
+     */
     resetPosition() {
         Animated.timing(this.animatedPositionX, {
             toValue: this.standardPositionX,
@@ -420,8 +444,12 @@ export default class ImageViewer extends Component{
         });
     }
 
+    /**
+     * show next image
+     * @param curIndex  current index of image's url in imageUrls
+     */
+
     next(curIndex){
-        //show next images
         let url = this.props.imageUrls[curIndex + 1];
 
         if(url){
@@ -430,13 +458,14 @@ export default class ImageViewer extends Component{
                 curIndex: curIndex + 1,
                 imageLoaded: false
             },this.callback)
-        } else {
-            return true;
         }
     }
 
+    /**
+     * show prev images
+     * @param curIndex  current index of image's url in imageUrls
+     */
     prev(curIndex){
-        //show prev images
         let url = this.props.imageUrls[curIndex - 1];
 
         if(url){
@@ -445,13 +474,11 @@ export default class ImageViewer extends Component{
                 curIndex: curIndex - 1,
                 imageLoaded: false
             },this.callback)
-        } else {
-            return true;
         }
     }
 
     /**
-     * the callback for state updated
+     * the callback for state updated when toggle image
      */
 
     callback(){
@@ -460,8 +487,12 @@ export default class ImageViewer extends Component{
         this.startRotate()
     }
 
+    /**
+     * this callback is required for android
+     * it's invoked when modal dismissed
+     */
     modalDismissed(){
-        //this callback is required for android
+
     }
 }
 
