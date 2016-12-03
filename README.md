@@ -72,9 +72,8 @@ closeViewer(){
 
 ## TODO
 
-* zoom image
-* loading animation when load image
-* title bar
+* pin
+* double click for zoom image
 
 ## License
 MIT

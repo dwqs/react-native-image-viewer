@@ -66,6 +66,9 @@ export default class ImageViewer extends Component{
         //the position of moveBox,for toggle image
         this.positionX = 0;
         this.animatedPositionX = new Animated.Value(0);
+
+        //scale the image for double click
+        this.imgScale = 1;
     }
 
     static propTypes = {
@@ -87,8 +90,6 @@ export default class ImageViewer extends Component{
             onPanResponderTerminationRequest: (evt, gestureState) => false,
 
             onPanResponderGrant: (evt, gestureState) => {
-                console.log('11111 grant',evt.nativeEvent);
-                console.log('111111111 grant',gestureState.dx,gestureState.dy);
                 if(evt.nativeEvent.changedTouches.length <= 1){
                     //single touch
                     this.isClick = true;
@@ -101,9 +102,6 @@ export default class ImageViewer extends Component{
             },
 
             onPanResponderMove: (evt, gestureState) => {
-                // 最近一次的移动距离为gestureState.move{X,Y}
-                // 从成为响应者开始时的累计手势移动距离为gestureState.d{x,y}
-                console.log('22222 Move',evt.nativeEvent);
                 console.log('222222 Move',gestureState.dx,gestureState.dy);
 
                 if(evt.nativeEvent.changedTouches.length <= 1){
@@ -122,14 +120,25 @@ export default class ImageViewer extends Component{
             },
 
             onPanResponderRelease: (evt, gestureState) => {
-                console.log('3333 Release',evt.nativeEvent);
-                console.log('3333333 Release',gestureState.dx,gestureState.dy);
+                //console.log('3333 Release',evt.nativeEvent);
+                //console.log('3333333 Release',gestureState.dx,gestureState.dy);
 
                 if(evt.nativeEvent.changedTouches.length <= 1){
                     if(this.isClick){
                         if(this.lastClickTime && new Date().getTime() - this.lastClickTime < 300){
                             clearTimeout(this.clickTimer);
                             console.log('double click');
+                            // let curIndex = this.state.curIndex;
+                            // let imageInfo = this.state.imagesInfo[curIndex];
+                            // if(this.imgScale === 1) {
+                            //     this.imgScale = 1.5;
+                            // } else {
+                            //     this.imgScale = 1;
+                            // }
+                            // Animated.timing(imageInfo.scalable,{
+                            //     toValue: this.imgScale,
+                            //     duration: 300
+                            // }).start();
                             this.lastClickTime = 0;
                             return;
                         }
@@ -192,10 +201,6 @@ export default class ImageViewer extends Component{
         }
     }
 
-    handleLayout(){
-        
-    }
-
     /**
      * render image list for preview
      */
@@ -206,6 +211,7 @@ export default class ImageViewer extends Component{
 
             let width = this.state.imagesInfo[index] && this.state.imagesInfo[index].width;
             let height = this.state.imagesInfo[index] && this.state.imagesInfo[index].height;
+            let scalable = this.state.imagesInfo[index] && this.state.imagesInfo[index].scalable;
             const imageInfo = this.state.imagesInfo[index];
 
             //zoom the image if image is too large
@@ -234,9 +240,9 @@ export default class ImageViewer extends Component{
                     return (
                         <Animated.Image
                             key={index}
-                            style={{width: width, height:height,transform:[{
-                                scale:1
-                            }]}}
+                            style={{width: width, height: height,transform:[
+                                { scale: scalable}
+                            ]}}
                             source={{uri:imageUrl}}>
                         </Animated.Image>
                     );
@@ -252,6 +258,10 @@ export default class ImageViewer extends Component{
         return ImageLists;
     }
 
+    handleLayout(){
+
+    }
+
     render(){
 
         let {shown,imageUrls} = this.props;
@@ -262,11 +272,13 @@ export default class ImageViewer extends Component{
 
         return (
             <Modal visible={shown} transparent={true} animationType={"none"} onRequestClose={this.modalDismissed.bind(this)} >
-                <View style={viewer.titleBar}>
+                <Animated.View style={[viewer.titleBar,{
+                    opacity:this.state.fadeAnim
+                }]}>
                     <Text style={viewer.title}>
                         {(this.state.curIndex + 1)} / {this.props.imageUrls.length}
                     </Text>
-                </View>
+                </Animated.View>
                 <Animated.View
                     style={[viewer.container,{
                         opacity:this.state.fadeAnim,
@@ -277,7 +289,7 @@ export default class ImageViewer extends Component{
                     onLayout={this.handleLayout.bind(this)}
                     {...this.imagePanResponder.panHandlers}>
                     <Animated.View style={[viewer.moveBox,{
-                        width:imageUrls.length * width,
+                        width:imageUrls.length * screenWidth,
                         transform: [{ translateX: this.animatedPositionX}]
                     }]}>
                         {this.state.imagesInfo.length && this.getImageList()}
@@ -307,6 +319,8 @@ export default class ImageViewer extends Component{
         this.standardPositionX = undefined;
         this.animatedPositionX = null;
         this.positionX = undefined;
+
+        this.imgScale = undefined;
     }
 
     /**
@@ -324,7 +338,8 @@ export default class ImageViewer extends Component{
                 width: 0,
                 height: 0,
                 status: 'loading',
-                url: url
+                url: url,
+                scalable: new Animated.Value(1)
             })
         });
 
@@ -344,8 +359,8 @@ export default class ImageViewer extends Component{
 
             //show current image of position
             let offset = this.state.midIndex - this.state.curIndex;
-            this.positionX = offset*width;
-            this.standardPositionX = len%2 === 0 ? this.positionX + width / 2 : this.positionX;
+            this.positionX = offset*screenWidth;
+            this.standardPositionX = len%2 === 0 ? this.positionX + screenWidth / 2 : this.positionX;
             this.animatedPositionX.setValue(this.standardPositionX);
 
             Animated.parallel([
@@ -359,7 +374,9 @@ export default class ImageViewer extends Component{
                     duration: 300,
                     easing: Easing.linear
                 })
-            ]).start();
+            ]).start(() => {
+                this.imgScale = 1;
+            });
         });
     }
 
@@ -453,7 +470,7 @@ export default class ImageViewer extends Component{
         let url = this.props.imageUrls[curIndex + 1];
 
         if(url){
-            this.standardPositionX -= width;
+            this.standardPositionX -= screenWidth;
             this.setState({
                 curIndex: curIndex + 1,
                 imageLoaded: false
@@ -469,7 +486,7 @@ export default class ImageViewer extends Component{
         let url = this.props.imageUrls[curIndex - 1];
 
         if(url){
-            this.standardPositionX += width;
+            this.standardPositionX += screenWidth;
             this.setState({
                 curIndex: curIndex - 1,
                 imageLoaded: false
@@ -500,7 +517,7 @@ let viewer = StyleSheet.create({
 
     titleBar:{
         height: 40,
-        width: width,
+        width: screenWidth,
         backgroundColor:'#000',
         justifyContent: 'center',
         alignItems: 'center',
@@ -518,37 +535,36 @@ let viewer = StyleSheet.create({
         alignItems: 'center',
         overflow: 'hidden',
         backgroundColor:'#000',
-        // borderWidth:1,
-        // borderColor:'red'
+        borderWidth:1,
+        borderColor:'red'
     },
 
     moveBox:{
-        //height:300,
         flexDirection: 'row',
         alignItems: 'center',
     },
 
     loadingImgView:{
-        width: width,
+        width: screenWidth,
         height: 300,
         justifyContent: 'center',
         alignItems: 'center'
     },
 
     loadingImg:{
-        width: width - 50,
+        width: screenWidth - 50,
         height: 150,
     },
 
     img:{
-        width: width,
+        width: screenWidth,
         height: 300,
     },
 
     loading:{
         position:'absolute',
-        top: height/2 - 30,
-        left: width/2 - 30
+        top: screenHeight/2 - 30,
+        left: screenWidth/2 - 30
     },
 
     common:{

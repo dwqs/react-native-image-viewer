@@ -34,7 +34,6 @@ export default class ImageViewerExample extends Component{
     }
 
     openViewer(index){
-        console.log('test',index);
         this.setState({
             shown:true,
             curIndex:index
