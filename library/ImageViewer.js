@@ -128,17 +128,20 @@ export default class ImageViewer extends Component{
                         if(this.lastClickTime && new Date().getTime() - this.lastClickTime < 300){
                             clearTimeout(this.clickTimer);
                             console.log('double click');
-                            // let curIndex = this.state.curIndex;
-                            // let imageInfo = this.state.imagesInfo[curIndex];
-                            // if(this.imgScale === 1) {
-                            //     this.imgScale = 1.5;
-                            // } else {
-                            //     this.imgScale = 1;
-                            // }
-                            // Animated.timing(imageInfo.scalable,{
-                            //     toValue: this.imgScale,
-                            //     duration: 300
-                            // }).start();
+                            let curIndex = this.state.curIndex;
+                            let imageInfo = this.state.imagesInfo[curIndex];
+
+                            if(this.imgScale === 1) {
+                                this.imgScale = 1.5;
+                            } else {
+                                this.imgScale = 1;
+                            }
+
+                            Animated.timing(imageInfo.scalable,{
+                                toValue: this.imgScale,
+                                duration: 300
+                            }).start();
+
                             this.lastClickTime = 0;
                             return;
                         }
@@ -225,7 +228,6 @@ export default class ImageViewer extends Component{
                 const HeightPixel = screenHeight / height;
                 width *= HeightPixel;
                 height *= HeightPixel;
-                //height -= 40;
             }
 
             switch (imageInfo.status){
@@ -238,19 +240,25 @@ export default class ImageViewer extends Component{
                     );
                 case 'success':
                     return (
-                        <Animated.Image
-                            key={index}
-                            style={{width: width, height: height,transform:[
-                                { scale: scalable}
-                            ]}}
-                            source={{uri:imageUrl}}>
-                        </Animated.Image>
+                        <View style={viewer.loadedImg} key={index}>
+                            <Animated.View
+                                style={{width: width, height: height,transform:[
+                                    { scale: scalable}
+                                ]}}>
+                                <Image
+                                    style={{width: width, height: height}}
+                                    source={{uri:imageUrl}}/>
+                            </Animated.View>
+                        </View>
+
                     );
                 case 'fail':
                     return (
-                        <Image key={index}
-                               style={viewer.img}
-                               source={{uri: this.props.failedUrl ? this.props.failedUrl : fetch_image_failed_url}}/>
+                        <View style={viewer.failedImg} key={index}>
+                            <Image
+                                style={viewer.failedImg}
+                                source={{uri: this.props.failedUrl ? this.props.failedUrl : fetch_image_failed_url}}/>
+                        </View>
                     );
             }
         });
@@ -471,6 +479,7 @@ export default class ImageViewer extends Component{
 
         if(url){
             this.standardPositionX -= screenWidth;
+            this.state.imagesInfo[curIndex].scalable.setValue(1);
             this.setState({
                 curIndex: curIndex + 1,
                 imageLoaded: false
@@ -487,6 +496,7 @@ export default class ImageViewer extends Component{
 
         if(url){
             this.standardPositionX += screenWidth;
+            this.state.imagesInfo[curIndex].scalable.setValue(1);
             this.setState({
                 curIndex: curIndex - 1,
                 imageLoaded: false
@@ -499,6 +509,7 @@ export default class ImageViewer extends Component{
      */
 
     callback(){
+        this.imgScale = 1;
         this.fetchImage(this.state.curIndex);
         this.resetPosition();
         this.startRotate()
@@ -556,7 +567,15 @@ let viewer = StyleSheet.create({
         height: 150,
     },
 
-    img:{
+    loadedImg:{
+        width: screenWidth,
+        height: screenHeight,
+        overflow:"hidden",
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+
+    failedImg:{
         width: screenWidth,
         height: 300,
     },
@@ -564,7 +583,7 @@ let viewer = StyleSheet.create({
     loading:{
         position:'absolute',
         top: screenHeight/2 - 30,
-        left: screenWidth/2 - 30
+        left: screenWidth/2 - 15
     },
 
     common:{
