@@ -10,7 +10,6 @@ import {
     View,
     Image,
     Text,
-    TouchableOpacity,
     Modal,
     Platform,
     PanResponder,
@@ -69,6 +68,18 @@ export default class ImageViewer extends Component{
 
         //scale the image for double click
         this.imgScale = 1;
+
+        //the whole offset of drag when scale
+        this.horizontalWholeCounter = 0;
+
+        //the max offset of drag
+        this.maxOffsetX = 0;
+
+        //layout of image
+        this.layoutImage = {};
+
+        //whether reached the drag border
+        this.isReachedBorder = false;
     }
 
     static propTypes = {
@@ -102,7 +113,10 @@ export default class ImageViewer extends Component{
             },
 
             onPanResponderMove: (evt, gestureState) => {
-                console.log('222222 Move',gestureState.dx,gestureState.dy);
+                //console.log('222222 Move',gestureState.dx,gestureState.dy);
+                let curIndex = this.state.curIndex;
+                let imageInfo = this.state.imagesInfo[curIndex];
+
 
                 if(evt.nativeEvent.changedTouches.length <= 1){
                     //reset the value of lastClickTime
@@ -111,9 +125,37 @@ export default class ImageViewer extends Component{
                         this.lastClickTime = 0;
                     }
 
-                    //offset the moveBox
-                    this.positionX = gestureState.dx + this.standardPositionX;
-                    this.animatedPositionX.setValue(this.positionX);
+                    if(this.imgScale === 1.5){
+                        let {width} = this.layoutImage[curIndex];
+                        this.maxOffsetX = Math.ceil(width * 0.5 / 2 - 30);
+
+                        let x = gestureState.dx + this.horizontalWholeCounter;
+                        this.isReachedBorder = false;
+
+                        if((x >= this.maxOffsetX) && gestureState.dx > 0){
+                            //drag left
+                            this.isReachedBorder = true;
+                            x = this.maxOffsetX;
+                        }
+
+                        if((x <= -this.maxOffsetX) && gestureState.dx < 0){
+                            // drag right
+                            this.isReachedBorder = true;
+                            x = -this.maxOffsetX;
+                        }
+
+                        !this.isReachedBorder && imageInfo.animatedX.setValue(x);
+
+                        if(this.isReachedBorder){
+                            //offset the moveBox
+                            this.positionX = gestureState.dx + this.standardPositionX;
+                            this.animatedPositionX.setValue(this.positionX);
+                        }
+                    } else {
+                        //offset the moveBox
+                        this.positionX = gestureState.dx + this.standardPositionX;
+                        this.animatedPositionX.setValue(this.positionX);
+                    }
                 } else {
 
                 }
@@ -127,7 +169,6 @@ export default class ImageViewer extends Component{
                     if(this.isClick){
                         if(this.lastClickTime && new Date().getTime() - this.lastClickTime < 300){
                             clearTimeout(this.clickTimer);
-                            console.log('double click');
                             let curIndex = this.state.curIndex;
                             let imageInfo = this.state.imagesInfo[curIndex];
 
@@ -135,17 +176,29 @@ export default class ImageViewer extends Component{
                                 this.imgScale = 1.5;
                             } else {
                                 this.imgScale = 1;
+                                imageInfo.animatedX.setValue(0);
                             }
 
                             Animated.timing(imageInfo.scalable,{
                                 toValue: this.imgScale,
                                 duration: 300
-                            }).start();
+                            }).start(() => {
+                                this.horizontalWholeCounter = 0;
+                                this.maxOffsetX = 0;
+                                this.isReachedBorder = false;
+                            });
 
                             this.lastClickTime = 0;
                             return;
                         }
                         this.lastClickTime = new Date().getTime();
+                    }
+
+                    if(this.imgScale === 1.5){
+                        if(!this.isReachedBorder){
+                            this.horizontalWholeCounter += gestureState.dx;
+                            return;
+                        }
                     }
 
                     //trigger click
@@ -212,10 +265,12 @@ export default class ImageViewer extends Component{
 
         const ImageLists = imageUrls.map((imageUrl,index) => {
 
-            let width = this.state.imagesInfo[index] && this.state.imagesInfo[index].width;
-            let height = this.state.imagesInfo[index] && this.state.imagesInfo[index].height;
-            let scalable = this.state.imagesInfo[index] && this.state.imagesInfo[index].scalable;
             const imageInfo = this.state.imagesInfo[index];
+
+            let width = imageInfo && imageInfo.width;
+            let height = imageInfo && imageInfo.height;
+            let scalable = imageInfo && imageInfo.scalable;
+            let animatedX = imageInfo && imageInfo.animatedX;
 
             //zoom the image if image is too large
             if (width > screenWidth) {
@@ -243,9 +298,13 @@ export default class ImageViewer extends Component{
                         <View style={viewer.loadedImg} key={index}>
                             <Animated.View
                                 style={{width: width, height: height,transform:[
-                                    { scale: scalable}
+                                    { scale: scalable},
+                                    { translateX: animatedX}
                                 ]}}>
                                 <Image
+                                    onLayout={(e) => {
+                                        this.layoutImage[index] = e.nativeEvent.layout;
+                                    }}
                                     style={{width: width, height: height}}
                                     source={{uri:imageUrl}}/>
                             </Animated.View>
@@ -329,6 +388,10 @@ export default class ImageViewer extends Component{
         this.positionX = undefined;
 
         this.imgScale = undefined;
+        this.horizontalWholeCounter = undefined;
+        this.maxOffsetX = undefined;
+        this.layoutImage = null;
+        this.isReachedBorder = undefined;
     }
 
     /**
@@ -347,9 +410,13 @@ export default class ImageViewer extends Component{
                 height: 0,
                 status: 'loading',
                 url: url,
-                scalable: new Animated.Value(1)
+                scalable: new Animated.Value(1),
+                animatedX: new Animated.Value(0),
             })
         });
+
+        //reset
+        this.layoutImage = {};
 
         this.setState({
             curIndex: index,
@@ -480,6 +547,7 @@ export default class ImageViewer extends Component{
         if(url){
             this.standardPositionX -= screenWidth;
             this.state.imagesInfo[curIndex].scalable.setValue(1);
+            this.state.imagesInfo[curIndex].animatedX.setValue(0);
             this.setState({
                 curIndex: curIndex + 1,
                 imageLoaded: false
@@ -497,6 +565,7 @@ export default class ImageViewer extends Component{
         if(url){
             this.standardPositionX += screenWidth;
             this.state.imagesInfo[curIndex].scalable.setValue(1);
+            this.state.imagesInfo[curIndex].animatedX.setValue(0);
             this.setState({
                 curIndex: curIndex - 1,
                 imageLoaded: false
@@ -510,6 +579,9 @@ export default class ImageViewer extends Component{
 
     callback(){
         this.imgScale = 1;
+        this.horizontalWholeCounter = 0;
+        this.maxOffsetX = 0;
+        this.isReachedBorder = false;
         this.fetchImage(this.state.curIndex);
         this.resetPosition();
         this.startRotate()

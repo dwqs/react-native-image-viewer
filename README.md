@@ -72,8 +72,7 @@ closeViewer(){
 
 ## TODO
 
-* pin
-* double click for zoom image
+* pinch
 
 ## License
 MIT
