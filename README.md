@@ -6,7 +6,7 @@ A pure JavaScript image viewer component for react-native apps with pan, support
 ## Show Cases
 
 #### On IOS:
-![viewer-ios](http://p1.bqimg.com/567571/b7515755d4d7d903.gif)
+![viewer-ios](http://i1.piimg.com/567571/7f8b7dbac2237dd4.gif)
 
 #### On Android:
 ![viewer-android](http://p1.bqimg.com/567571/a51bff7b99e0462b.gif)
@@ -69,6 +69,13 @@ closeViewer(){
 |imageUrls|it's a array of images' url|required|
 |onClose|hidden the ImageViewer when click on ImageViewer|required|
 |index|the index of image url(in imageUrls) when open the ImageViewer|required|
+|failedUrl|the url for image preview loaded failure|not required|
+
+## Feature
+
+* pan to image toggling 
+* double click for image zooming
+* animation for image showing
 
 ## TODO
 
