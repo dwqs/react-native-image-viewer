@@ -38,3 +38,4 @@ jspm_packages
 ios
 android
 __tests__
+.DS_Store
