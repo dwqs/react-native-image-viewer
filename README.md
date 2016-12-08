@@ -6,7 +6,7 @@ A pure JavaScript image viewer component for react-native apps with pan, pinch.e
 ## Show Cases
 
 #### On IOS:
-![viewer-ios](http://i1.piimg.com/567571/7f8b7dbac2237dd4.gif)
+![viewer-ios](http://i1.piimg.com/567571/fb99f550e3ed72f3.gif)
 
 #### On Android:
 ![viewer-android](http://p1.bqimg.com/567571/a51bff7b99e0462b.gif)
