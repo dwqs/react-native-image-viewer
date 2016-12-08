@@ -38,6 +38,7 @@ export default class ImageViewer extends Component{
             curIndex: 0,
             midIndex: 0,
             maxIndex: 0,
+
             imagesInfo:[],
             imageLoaded: false,   //whether image loaded fail or success, it'll be true
 
@@ -75,11 +76,15 @@ export default class ImageViewer extends Component{
         //the max offset of drag
         this.maxOffsetX = 0;
 
-        //layout of image
+        //layout info of image
         this.layoutImage = {};
 
-        //whether reached the drag border
+        //whether reached the drag border when drag the image
         this.isReachedBorder = false;
+
+        //pinch for zoom image
+        this.zoomCurrentDistance = 0;
+        this.zoomLastDistance = undefined;
     }
 
     static propTypes = {
@@ -101,6 +106,7 @@ export default class ImageViewer extends Component{
             onPanResponderTerminationRequest: (evt, gestureState) => false,
 
             onPanResponderGrant: (evt, gestureState) => {
+                this.zoomLastDistance = undefined;
                 if(evt.nativeEvent.changedTouches.length <= 1){
                     //single touch
                     this.isClick = true;
@@ -113,12 +119,13 @@ export default class ImageViewer extends Component{
             },
 
             onPanResponderMove: (evt, gestureState) => {
-                //console.log('222222 Move',gestureState.dx,gestureState.dy);
+
+                let touches = evt.nativeEvent.changedTouches;
                 let curIndex = this.state.curIndex;
                 let imageInfo = this.state.imagesInfo[curIndex];
 
 
-                if(evt.nativeEvent.changedTouches.length <= 1){
+                if(touches.length <= 1){
                     //reset the value of lastClickTime
                     if(this.isClick){
                         this.isClick = false;
@@ -157,13 +164,50 @@ export default class ImageViewer extends Component{
                         this.animatedPositionX.setValue(this.positionX);
                     }
                 } else {
+                    let minX, maxX;
+                    let minY, maxY;
 
+                    if (touches[0].locationX > touches[1].locationX) {
+                        minX = touches[1].pageX;
+                        maxX = touches[0].pageX;
+                    } else {
+                        minX = touches[0].pageX;
+                        maxX = touches[1].pageX;
+                    }
+
+                    if (touches[0].locationY > touches[1].locationY) {
+                        minY = touches[1].pageY;
+                        maxY = touches[0].pageY;
+                    } else {
+                        minY = touches[0].pageY;
+                        maxY = touches[1].pageY;
+                    }
+
+                    const widthDistance = maxX - minX;
+                    const heightDistance = maxY - minY;
+                    const diagonalDistance = Math.sqrt(widthDistance * widthDistance + heightDistance * heightDistance);
+                    this.zoomCurrentDistance = Number(diagonalDistance.toFixed(1));
+
+                    if(this.zoomLastDistance !== undefined){
+                        let distanceDiff = (this.zoomCurrentDistance - this.zoomLastDistance) / 200;
+                        let zoom = this.imgScale + distanceDiff;
+
+                        if (zoom < 1) {
+                            zoom = 1;
+                        }
+                        if (zoom > 1.5) {
+                            zoom = 1.5;
+                        }
+
+                        this.imgScale = zoom;
+                        imageInfo.scalable.setValue(this.imgScale);
+
+                    }
+                    this.zoomLastDistance = this.zoomCurrentDistance;
                 }
             },
 
             onPanResponderRelease: (evt, gestureState) => {
-                //console.log('3333 Release',evt.nativeEvent);
-                //console.log('3333333 Release',gestureState.dx,gestureState.dy);
 
                 if(evt.nativeEvent.changedTouches.length <= 1){
                     if(this.isClick){
@@ -239,7 +283,7 @@ export default class ImageViewer extends Component{
                         this.resetPosition();
                     }
                 } else {
-                    console.log('多指触发');
+                    console.log('multiple touches');
                 }
             },
 
@@ -392,6 +436,9 @@ export default class ImageViewer extends Component{
         this.maxOffsetX = undefined;
         this.layoutImage = null;
         this.isReachedBorder = undefined;
+
+        this.zoomCurrentDistance = undefined;
+        this.zoomLastDistance = undefined;
     }
 
     /**

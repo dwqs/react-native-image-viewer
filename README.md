@@ -1,5 +1,5 @@
 ## Overview
-A pure JavaScript image viewer component for react-native apps with pan, supporting both iOS and Android.
+A pure JavaScript image viewer component for react-native apps with pan, pinch.etc, supporting both iOS and Android.
 
 >React Native required 0.33+
 
@@ -75,11 +75,8 @@ closeViewer(){
 
 * pan to image toggling 
 * double click for image zooming
+* pinch for zoom image
 * animation for image showing
-
-## TODO
-
-* pinch
 
 ## License
 MIT
