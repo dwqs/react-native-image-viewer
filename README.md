@@ -31,9 +31,6 @@ Then use it:
 ```
 // ES6 mudule
 import ImageViewer from 'ImageViewer';
-
-//CommonJS
-var ImageViewer = require('ImageViewer');
 ```
 
 ## Usage
