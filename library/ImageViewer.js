@@ -293,6 +293,16 @@ export default class ImageViewer extends Component{
         });
     }
 
+
+    componentDidMount() {
+
+        // compoentWillReceiveProps not be triggle ...
+        if(this.props.shown){
+            //initial state data
+            this.init(this.props);
+        }
+    }
+
     componentWillReceiveProps(nextProps){
 
         if(nextProps.shown){
@@ -403,7 +413,7 @@ export default class ImageViewer extends Component{
                         width:imageUrls.length * screenWidth,
                         transform: [{ translateX: this.animatedPositionX}]
                     }]}>
-                        {this.state.imagesInfo.length && this.getImageList()}
+                        { this.state.imagesInfo.length > 0 ? this.getImageList() : null}
                     </Animated.View>
                     {
                         !this.state.imageLoaded ?
