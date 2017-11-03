@@ -28,7 +28,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "prop-types": "^15.6.0",
+    "prop-types": "^15.6.0"
   },
   "jest": {
     "preset": "jest-react-native"
