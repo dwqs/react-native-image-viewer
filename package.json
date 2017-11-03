@@ -27,7 +27,9 @@
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "test": "jest"
   },
-  "dependencies": {},
+  "dependencies": {
+    "prop-types": "^15.6.0",
+  },
   "jest": {
     "preset": "jest-react-native"
   },
