@@ -2,6 +2,9 @@
   "name": "ImageViewer",
   "version": "1.5.8",
   "author": "pomysky@gamil.com",
+  "contributors": [
+    "mxmtsk <max@movact.de>"
+  ],
   "description": "A pure JavaScript image viewer component for react-native apps",
   "main": "library/ImageViewer.js",
   "license": "MIT",
