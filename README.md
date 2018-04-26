@@ -1,4 +1,4 @@
-![download](https://img.shields.io/npm/dt/ImageViewer.svg) ![npm-version](https://img.shields.io/npm/v/ImageViewer.svg) ![license](https://img.shields.io/npm/l/ImageViewer.svg)
+![download](https://img.shields.io/npm/dt/@dwqs/react-native-image-viewer.svg) ![npm-version](https://img.shields.io/npm/v/@dwqs/react-native-image-viewer.svg) ![license](https://img.shields.io/npm/l/@dwqs/react-native-image-viewer.svg)
 
 ## Overview
 A pure JavaScript image viewer component for react-native apps with pan, pinch.etc, supporting both iOS and Android.
@@ -10,8 +10,12 @@ A pure JavaScript image viewer component for react-native apps with pan, pinch.e
 #### On IOS:
 ![viewer-ios](http://onasvjoyz.bkt.clouddn.com/viewer-ios.gif)
 
+gif: http://onasvjoyz.bkt.clouddn.com/viewer-ios.gif
+
 #### On Android:
 ![viewer-android](http://onasvjoyz.bkt.clouddn.com/viewer-android.gif)
+
+gif: http://onasvjoyz.bkt.clouddn.com/viewer-android.gif
 
 ## Installation
 First, install `react-native-image-viewer` from npm:
