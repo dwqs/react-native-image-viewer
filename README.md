@@ -8,43 +8,40 @@ A pure JavaScript image viewer component for react-native apps with pan, pinch.e
 ## Show Cases
 
 #### On IOS:
-![viewer-ios](http://i1.piimg.com/567571/fb99f550e3ed72f3.gif)
+![viewer-ios](http://onasvjoyz.bkt.clouddn.com/viewer-ios.gif)
 
 #### On Android:
-![viewer-android](http://p1.bqimg.com/567571/a51bff7b99e0462b.gif)
+![viewer-android](http://onasvjoyz.bkt.clouddn.com/viewer-android.gif)
 
 ## Installation
 First, install `react-native-image-viewer` from npm:
 
 ```
-npm install ImageViewer --save-dev
+npm i @dwqs/react-native-image-viewer --save
 ```
 
-Or in **package.json**:
+Or yarn:
 
 ```
-"dependencies": {
-  "ImageViewer": "version"
-}
+yarn add @dwqs/react-native-image-viewer
 ```
 
 Then use it:
 
 ```
 // ES6 mudule
-import ImageViewer from 'ImageViewer';
+import ImageViewer from '@dwqs/react-native-image-viewer';
 ```
 
 ## Usage
-There are some code from `example/src/index.js`:
+There are some code from `example/App.js`:
 
 ```
 let imgsArr = [
+    'https://facebook.github.io/react/logo-og.png',
     'http://scimg.jb51.net/allimg/160815/103-160Q509544OC.jpg',
     'http://img.sc115.com/uploads1/sc/jpgs/1508/apic22412_sc115.com.jpg',
-    'http://h.hiphotos.baidu.com/zhidao/pic/item/0df431adcbef7609bca7d58a2adda3cc7cd99e73.jpg',
-    'http://facebook.github.io/react/img/logo_og.png',
-    'http://scimg.jb51.net/allimg/160815/103-160Q509544OC.jpg'
+    'http://h.hiphotos.baidu.com/zhidao/pic/item/0df431adcbef7609bca7d58a2adda3cc7cd99e73.jpg'
 ];
 
 closeViewer(){
