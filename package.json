@@ -1,9 +1,9 @@
 {
-  "name": "ImageViewer",
-  "version": "1.5.8",
+  "name": "@dwqs/react-native-image-viewer",
+  "version": "1.5.9",
   "author": "pomysky@gamil.com",
   "description": "A pure JavaScript image viewer component for react-native apps",
-  "main": "library/ImageViewer.js",
+  "main": "src/index.js",
   "license": "MIT",
   "keywords": [
     "react",
@@ -23,29 +23,29 @@
       "email": "max@movact.de"
     }
   ],
+  "files": [
+    "src",
+    "package.json",
+    "README.md",
+    "LICENSE",
+    ".babelrc"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/dwqs/react-native-image-viewer.git"
   },
   "scripts": {
-    "start": "node node_modules/react-native/local-cli/cli.js start",
-    "test": "jest"
+    "start": "node node_modules/react-native/local-cli/cli.js start"
   },
   "dependencies": {
     "prop-types": "^15.6.0"
   },
-  "jest": {
-    "preset": "jest-react-native"
-  },
   "devDependencies": {
-    "babel-jest": "17.0.0",
-    "babel-plugin-transform-class-properties": "6.19.0",
-    "babel-preset-react-native": "1.9.0",
-    "jest": "17.0.1",
-    "jest-react-native": "17.0.1",
-    "react": "15.3.2",
-    "react-native": "0.37.0",
-    "react-test-renderer": "15.3.2"
+    "babel-plugin-transform-class-properties": "6.24.1",
+    "babel-plugin-transform-react-remove-prop-types": "^0.4.9",
+    "babel-preset-react-native": "4.0.0",
+    "react": "*",
+    "react-native": "*"
   },
   "bugs": {
     "url": "https://github.com/dwqs/react-native-image-viewer/issues"
