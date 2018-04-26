@@ -1,4 +1,4 @@
-![download](https://img.shields.io/npm/dt/@dwqs/react-native-image-viewer.svg) ![npm-version](https://img.shields.io/npm/v/@dwqs/react-native-image-viewer.svg) ![license](https://img.shields.io/npm/l/@dwqs/react-native-image-viewer.svg)
+![npm-version](https://img.shields.io/npm/v/@dwqs/react-native-image-viewer.svg) ![license](https://img.shields.io/npm/l/@dwqs/react-native-image-viewer.svg)
 
 ## Overview
 A pure JavaScript image viewer component for react-native apps with pan, pinch.etc, supporting both iOS and Android.
