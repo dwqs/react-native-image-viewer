@@ -1,6 +1,6 @@
 {
   "name": "@dwqs/react-native-image-viewer",
-  "version": "1.5.9",
+  "version": "2.0.0",
   "author": "pomysky@gamil.com",
   "description": "A pure JavaScript image viewer component for react-native apps",
   "main": "src/index.js",
